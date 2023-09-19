@@ -12,4 +12,5 @@ public class UserDetails {
     private Long id;
     private String userName;
     private String userRole;
+    private String password;
 }

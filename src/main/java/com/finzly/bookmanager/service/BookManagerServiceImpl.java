@@ -2,6 +2,7 @@ package com.finzly.bookmanager.service;
 
 import com.finzly.bookmanager.database.entity.Book;
 import com.finzly.bookmanager.database.repo.BookRepository;
+import com.finzly.bookmanager.exceptions.NoBooksFoundException;
 import com.finzly.bookmanager.models.BookDetails;
 import com.finzly.bookmanager.models.BookRetrieveRequest;
 import com.finzly.bookmanager.transformer.BookDataTransformer;
@@ -30,6 +31,9 @@ public class BookManagerServiceImpl implements IBookManagerService {
     public Page<BookDetails> queryBooks(BookRetrieveRequest bookRetrieveRequest) {
         Page<Book> books = bookRepository.findAll(createSpecification(bookRetrieveRequest),
                 PageRequest.of(bookRetrieveRequest.getPage(), bookRetrieveRequest.getSize()));
+        if(Objects.isNull(books)){
+            throw new NoBooksFoundException("No Books are available");
+        }
         return books.map(bookDataTransformer::toBookDetails);
     }
 

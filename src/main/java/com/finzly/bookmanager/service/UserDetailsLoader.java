@@ -1,9 +1,10 @@
-package com.finzly.bookmanager.loader;
+package com.finzly.bookmanager.service;
 
 import com.finzly.bookmanager.models.UserRetrieveRequest;
 import com.finzly.bookmanager.service.IUserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -22,7 +24,7 @@ public class UserDetailsLoader implements UserDetailsService {
 
     @PostConstruct
     public void init() {
-        userService.queryUsers(UserRetrieveRequest.builder().build()).stream()
+       userService.queryUsers(UserRetrieveRequest.builder().build()).stream()
                 .map(user -> User.builder()
                         .username(user.getUserName())
                         .password(SALT_STRING)
@@ -30,8 +32,13 @@ public class UserDetailsLoader implements UserDetailsService {
                         .build()).forEach(user -> userDetailsMap.put(user.getUsername(), user));
     }
 
-    @Override
+    //@Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userDetailsMap.get(username);
+    }
+
+    public boolean isValidUser(final com.finzly.bookmanager.models.UserDetails userDetails) {
+        return Optional.ofNullable(loadUserByUsername(userDetails.getUserName()))
+                .map(user-> StringUtils.equals(user.getPassword(),userDetails.getPassword())).orElse(Boolean.FALSE);
     }
 }

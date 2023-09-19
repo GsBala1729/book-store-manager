@@ -2,6 +2,7 @@ package com.finzly.bookmanager.service;
 
 import com.finzly.bookmanager.database.entity.User;
 import com.finzly.bookmanager.database.repo.UserRepository;
+import com.finzly.bookmanager.exceptions.UsersNotAvailableException;
 import com.finzly.bookmanager.models.UserDetails;
 import com.finzly.bookmanager.models.UserRetrieveRequest;
 import com.finzly.bookmanager.transformer.UserDataTransformer;
@@ -34,6 +35,9 @@ public class UserServiceImpl implements IUserService {
 
         Page<User> users = userRepository.findAll(createSpecification(userRetrieveRequest),
                 PageRequest.of(userRetrieveRequest.getPage(), userRetrieveRequest.getSize()));
+        if(Objects.isNull(users)){
+            throw new UsersNotAvailableException("User Not available");
+        }
         return users.map(userDataTransformer::userEntityToPojo);
     }
 

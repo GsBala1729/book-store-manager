@@ -4,10 +4,9 @@ spring:
     url: jdbc:mysql://localhost:3306/book-manager
     username: root
     password: Acube@1729
-  h2:
-    console:
-      enabled: true  # Enable H2 console for development (optional)
   jpa:
     hibernate:
-      ddl-auto: update  # Automatically create/update database schema
     show-sql: true  # Show SQL statements in the console (optional)
+logging:
+  level:
+    org.springframework.security: DEBUG

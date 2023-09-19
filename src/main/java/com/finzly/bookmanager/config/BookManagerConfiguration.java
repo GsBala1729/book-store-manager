@@ -6,16 +6,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.Collections;
 
 @Slf4j
 @Configuration
@@ -30,11 +33,10 @@ public class BookManagerConfiguration {
                                                    final UserDetailsService userDetailsService) throws Exception {
         http.httpBasic(Customizer.withDefaults())
                 .userDetailsService(userDetailsService)
-                .formLogin((FormLoginConfigurer) -> new FormLoginConfigurer())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .authorizeRequests()
-                .requestMatchers("/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "**/user/**","**/book/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "**/user/**","**/book/**").authenticated()
+                .requestMatchers("/user/login").permitAll()
                 .anyRequest().authenticated();
 
         return http.build();
@@ -44,4 +46,20 @@ public class BookManagerConfiguration {
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
+
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowCredentials(true); // Allow credentials (e.g., cookies, HTTP authentication)
+        corsConfig.setAllowedOrigins(Collections.singletonList("localhost:4200"));
+        corsConfig.addAllowedHeader("*"); // Allow all headers
+        corsConfig.addAllowedMethod("*"); // Allow all HTTP methods
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return new CorsFilter(source);
+    }
+
 }
+

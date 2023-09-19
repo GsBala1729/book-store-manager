@@ -1,5 +1,6 @@
 package com.finzly.bookmanager.controller;
 
+import com.finzly.bookmanager.exceptions.BookMgrAuthException;
 import com.finzly.bookmanager.models.BookDetails;
 import com.finzly.bookmanager.models.BookRetrieveRequest;
 import com.finzly.bookmanager.service.IBookManagerService;
@@ -20,13 +21,21 @@ public class BookManagerController {
     public ResponseEntity<Page<BookDetails>> getBooks(@RequestParam(value = "book_id", required = false) final Long bookId,
                                                       @RequestParam(value = "book_name", required = false) final String bookName) {
         return ResponseEntity.ok().body(bookManagerService.queryBooks(BookRetrieveRequest.builder()
-                        .bookId(bookId).bookName(bookName).build()));
+                .bookId(bookId).bookName(bookName).build()));
     }
 
     @PostMapping
     public ResponseEntity createBook(@RequestBody @NonNull final BookDetails bookDetails) {
-        bookManagerService.createBook(bookDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Book details Created in Db");
+        try {
+            bookManagerService.createBook(bookDetails);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Book details Created in Db");
+        } catch (BookMgrAuthException authException) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("");
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(exception.getMessage());
+        }
     }
 
     @PutMapping
