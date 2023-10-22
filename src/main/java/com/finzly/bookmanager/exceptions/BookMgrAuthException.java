@@ -1,8 +1,6 @@
 package com.finzly.bookmanager.exceptions;
 
-import org.springframework.security.core.AuthenticationException;
-
-public class BookMgrAuthException extends AuthenticationException {
+public class BookMgrAuthException extends RuntimeException {
     public BookMgrAuthException(String msg, Throwable cause) {
         super(msg, cause);
 

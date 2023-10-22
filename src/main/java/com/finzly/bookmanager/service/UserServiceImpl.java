@@ -45,7 +45,7 @@ public class UserServiceImpl implements IUserService {
     public void createUser(UserDetails userDetails) {
         final User user = userDataTransformer.userPojoToEntity(userDetails);
         if (Objects.isNull(user)) {
-            log.info("user Entity Cannot Be Null");
+            //log.info("user Entity Cannot Be Null");
             throw new IllegalArgumentException("user Entity Cannot Be Null");
         }
         userRepository.save(user);
@@ -55,7 +55,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void updateUser(UserDetails userDetails) {
         if (Objects.isNull(userDetails) || Objects.isNull(userDetails.getId())) {
-            log.info("User Entity Or user Id Cannot Be Null");
+            //log.info("User Entity Or user Id Cannot Be Null");
             throw new IllegalArgumentException("User Entity Or User Id Cannot Be Null");
         }
         final User userFromDB = userRepository.findById(userDetails.getId())

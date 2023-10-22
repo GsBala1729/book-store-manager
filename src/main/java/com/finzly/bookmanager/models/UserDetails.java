@@ -12,5 +12,6 @@ public class UserDetails {
     private Long id;
     private String userName;
     private String userRole;
+    @JsonIgnore
     private String password;
 }
